@@ -16,7 +16,7 @@ const NavBar = () => {
 
   return (
     <>
-      <nav className='flex space-x-6 px-6 py-5 border-b items-center text-white bg-slate-800'>
+      <nav className='flex space-x-6 px-6 py-5 items-center text-white bg-slate-800'>
         <Link href="/"><FaBug /></Link>
         <ul className='flex gap-6'>
           {
