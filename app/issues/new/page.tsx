@@ -1,40 +1,66 @@
-'use client'
+'use client';
 
-import { Button, TextField } from '@radix-ui/themes'
-import SimpleMDE from "react-simplemde-editor";
+import { Button, Callout, Text, TextField } from '@radix-ui/themes'
 import "easymde/dist/easymde.min.css";
 import { Controller, useForm } from 'react-hook-form';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import dynamic from 'next/dynamic';
+import { createIssueSchema } from '@/app/validationSchemas';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-interface IssueForm {
-  title: string,
-  description: string
-}
+const SimpleMDE = dynamic(() => import('react-simplemde-editor'), { ssr: false })
+
+
+type IssueForm = z.infer<typeof createIssueSchema>
 
 const NewIssuePage = () => {
-  const { register, control, handleSubmit } = useForm<IssueForm>()
+  const { register, control, handleSubmit, formState: { errors } } = useForm<IssueForm>({
+    resolver: zodResolver(createIssueSchema)
+  })
   const router = useRouter()
 
+  const [error, setError] = useState('')
+
   const handleIssueSubmit = async (data: IssueForm) => {
-    await axios.post('/api/issues', data)
-    return router.push('/issues')
+    try {
+      await axios.post('/api/issues', data)
+      return router.push('/issues')
+    } catch (err) {
+      setError('An unexpected error occured.')
+    }
   }
 
   return (
-    <form className='max-w-xl space-y-4' onSubmit={handleSubmit(handleIssueSubmit)}>
-      <TextField.Root>
-        <TextField.Input placeholder='Title' {...register('title')} />
-      </TextField.Root>
-      <Controller
-        name='description'
-        control={control}
-        render={({ field }) => {
-          return <SimpleMDE {...field} />
-        }}
-      />
-      <Button>Create</Button>
-    </form>
+    <div className='max-w-xl'>
+      {error && <Callout.Root color='red' className='mb-4'>
+        <Callout.Text>{error}</Callout.Text>
+      </Callout.Root>}
+      <form className='space-y-4' onSubmit={handleSubmit(handleIssueSubmit)}>
+
+        <div>
+          <TextField.Root>
+            <TextField.Input placeholder='Title' {...register('title')} />
+          </TextField.Root>
+          {errors.title && <Text color='red' as='p'>{errors.title.message}</Text>}
+        </div>
+
+        <div>
+          <Controller
+            name='description'
+            control={control}
+            render={({ field }) => {
+              return <SimpleMDE placeholder='description' />
+            }}
+          />
+          {errors.description && <Text color='red' as='p'>{errors.description.message}</Text>}
+        </div>
+
+        <Button>Create</Button>
+      </form>
+    </div>
   )
 }
 
