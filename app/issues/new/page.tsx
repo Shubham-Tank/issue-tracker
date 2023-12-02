@@ -63,7 +63,7 @@ const NewIssuePage = () => {
           <ErrorMessage>{errors.description?.message}</ErrorMessage>
         </div>
 
-        <Button disabled={true}>
+        <Button disabled={isSubmitting}>
           {isSubmitting ? <Spinner /> : 'Create'}
         </Button>
       </form>
