@@ -1,4 +1,4 @@
-import SkeletonTheme from '@/app/components/SkeletonTheme'
+import { SkeletonTheme } from '@/app/components'
 import { Box } from '@radix-ui/themes'
 import React from 'react'
 import Skeleton from 'react-loading-skeleton'

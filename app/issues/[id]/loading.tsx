@@ -1,4 +1,4 @@
-import SkeletonTheme from '@/app/components/SkeletonTheme'
+import { SkeletonTheme } from '@/app/components'
 import { Card, Flex, Heading } from '@radix-ui/themes'
 import Skeleton from 'react-loading-skeleton'
 
