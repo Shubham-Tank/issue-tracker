@@ -12,8 +12,20 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import ErrorMessage from '@/app/components/ErrorMessage';
 import Spinner from '@/app/components/Spinner';
+import Skeleton from 'react-loading-skeleton';
+import SkeletonTheme from '@/app/components/SkeletonTheme';
 
-const SimpleMDE = dynamic(() => import('react-simplemde-editor'), { ssr: false })
+const SimpleMDE = dynamic(
+  () => import('react-simplemde-editor'),
+  {
+    loading: () => (
+      <SkeletonTheme>
+        <Skeleton height="20rem" />
+      </SkeletonTheme>
+    ),
+    ssr: false
+  }
+)
 
 
 type IssueForm = z.infer<typeof createIssueSchema>
