@@ -25,7 +25,7 @@ const IssueDetailPage = async ({ params }: Props) => {
         <IssueStatusBadge status={issue.status} />
         <Text className='text-sm text-gray-400'>{issue.createdAt.toDateString()}</Text>
       </Flex>
-      <Card className="prose prose-neutral dark:prose-invert">
+      <Card className="prose py-1 px-2 prose-neutral dark:prose-invert">
         <Markdown>{issue.description}</Markdown>
       </Card>
     </div>
