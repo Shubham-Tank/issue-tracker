@@ -62,7 +62,7 @@ const AuthStatus = () => {
 
   if (status === 'loading') return (
     <SkeletonTheme>
-      <Skeleton width="3rem" />
+      <Skeleton width="2rem" height="1.75rem" borderRadius="0.5rem" />
     </SkeletonTheme>
   )
 
