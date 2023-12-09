@@ -1,9 +1,8 @@
-import { Issue, Status } from '@prisma/client'
-import React from 'react'
+import { Issue } from '@prisma/client'
+import { Flex } from '@radix-ui/themes'
 import NextLink from 'next/link'
 import { RxArrowDown, RxArrowUp } from 'react-icons/rx'
-import { IssueListSearchParams } from './page'
-import { Flex } from '@radix-ui/themes'
+import { IssueQuery } from './IssueTable'
 
 interface Props {
   column: {
@@ -11,7 +10,7 @@ interface Props {
     value: keyof Issue,
     className?: string
   },
-  searchParams: IssueListSearchParams
+  searchParams: IssueQuery
 }
 
 const IssueColumnHeaderLink = ({ column, searchParams }: Props) => {
