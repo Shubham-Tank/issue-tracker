@@ -18,10 +18,10 @@ const IssueColumnHeaderLink = ({ column, searchParams }: Props) => {
 
   const query = { ...searchParams, orderBy: column.value }
 
-  if (query.dsc)
-    delete query.dsc
+  if (query.desc)
+    delete query.desc
   else if (searchParams?.orderBy === column.value)
-    query.dsc = true
+    query.desc = true
 
   return (
     <Flex align="center">
@@ -30,7 +30,7 @@ const IssueColumnHeaderLink = ({ column, searchParams }: Props) => {
       </NextLink>
       {
         (searchParams?.orderBy === column.value) && (
-          (searchParams.dsc) ? <RxArrowDown className="inline ml-1" /> : <RxArrowUp className="inline ml-1" />
+          (searchParams.desc) ? <RxArrowDown className="inline ml-1" /> : <RxArrowUp className="inline ml-1" />
         )
       }
     </Flex>
