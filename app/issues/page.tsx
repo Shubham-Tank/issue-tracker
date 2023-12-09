@@ -14,16 +14,6 @@ const IssuesPage = async ({ searchParams }: Props) => {
   const statuses = Object.values(Status)
   const status = statuses.includes(searchParams.status) ? searchParams.status : undefined
 
-  const columns: {
-    label: string,
-    value: keyof Issue,
-    className?: string
-  }[] = [
-      { label: 'Issue', value: 'title' },
-      { label: 'Status', value: 'status', className: 'hidden md:table-cell' },
-      { label: 'Created', value: 'createdAt', className: 'hidden md:table-cell' },
-    ]
-
   const orderBy = issueTableColNames
     .includes(searchParams.orderBy)
     ? {
