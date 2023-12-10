@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#simplemde-editor-2-wrapper .editor-toolbar {
+  border: 1px solid var(--gray-a7);
+  border-bottom: none;
+}
+
+#simplemde-editor-2-wrapper .CodeMirror {
+  border: 1px solid var(--gray-a7);
+  clip-path: none !important;
+  background-color: var(--gray-3) !important;
+}
+
+#simplemde-editor-2-wrapper .CodeMirror-cursor {
+  border-left: 1px solid var(--gray-12);
+}
+
+#simplemde-editor-2-wrapper .editor-toolbar button.active,
+#simplemde-editor-2-wrapper .editor-toolbar button:hover {
+  background: var(--gray-4);
+  border-color: var(--gray-4);
+}
+
+.rt-TextFieldChrome {
+  outline: none !important;
+}

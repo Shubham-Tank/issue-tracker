@@ -47,7 +47,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
 
         <div>
           <TextField.Root>
-            <TextField.Input defaultValue={issue?.title} placeholder='Title' {...register('title')} />
+            <TextField.Input style={{ padding: '1.1rem 0.45rem' }} defaultValue={issue?.title} placeholder='Title' {...register('title')} />
           </TextField.Root>
           <ErrorMessage>{errors.title?.message}</ErrorMessage>
         </div>
