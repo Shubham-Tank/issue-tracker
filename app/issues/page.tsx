@@ -5,6 +5,7 @@ import IssueActions from './IssueActions'
 import IssueTable, { IssueQuery, issueTableColNames } from './IssueTable'
 import { Flex } from '@radix-ui/themes'
 import { Metadata } from 'next'
+import delay from 'delay'
 
 interface Props {
   searchParams: IssueQuery
@@ -30,6 +31,8 @@ const IssuesPage = async ({ searchParams }: Props) => {
     skip: (page - 1) * pageSize,
     take: pageSize
   })
+
+  await delay(5000)
 
   const issueCount = await prisma.issue.count({ where: { status } })
 
