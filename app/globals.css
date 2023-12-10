@@ -2,23 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-#simplemde-editor-2-wrapper .editor-toolbar {
+.EasyMDEContainer .editor-toolbar {
   border: 1px solid var(--gray-a7);
   border-bottom: none;
 }
 
-#simplemde-editor-2-wrapper .CodeMirror {
-  border: 1px solid var(--gray-a7);
+.EasyMDEContainer .CodeMirror {
+  border: 1px solid var(--gray-a7) !important;
   clip-path: none !important;
   background-color: var(--gray-3) !important;
 }
 
-#simplemde-editor-2-wrapper .CodeMirror-cursor {
+.EasyMDEContainer .CodeMirror-cursor {
   border-left: 1px solid var(--gray-12);
 }
 
-#simplemde-editor-2-wrapper .editor-toolbar button.active,
-#simplemde-editor-2-wrapper .editor-toolbar button:hover {
+.EasyMDEContainer .editor-toolbar button.active,
+.EasyMDEContainer .editor-toolbar button:hover {
   background: var(--gray-4);
   border-color: var(--gray-4);
 }
