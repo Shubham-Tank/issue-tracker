@@ -6,7 +6,7 @@ const IssueFormSkeleton = () => {
   return (
     <SkeletonTheme>
       <Box className='max-w-xl'>
-        <Skeleton height="1.8rem" className='mb-4' />
+        <Skeleton height="2.2rem" className='mb-3' />
         <Skeleton height="20rem" />
       </Box>
     </SkeletonTheme>
