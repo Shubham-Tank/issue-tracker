@@ -2,16 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from '@/prisma/client'
 import bcrypt from 'bcrypt'
-
-const schema = z.object({
-  name: z.string().min(5).max(50),
-  email: z.string().email(),
-  password: z.string().min(5)
-})
+import { registerUserSchema } from "@/app/validationSchemas";
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const validation = schema.safeParse(body)
+  const validation = registerUserSchema.safeParse(body)
 
   if (!validation.success)
     return NextResponse.json(validation.error.errors, { status: 400 })
@@ -21,7 +16,10 @@ export async function POST(request: NextRequest) {
   })
 
   if (user)
-    return NextResponse.json({ error: 'User already exists' }, { status: 400 })
+    return NextResponse.json({
+      code: 'already_exists',
+      message: 'User with this email already exists. Please try another email.'
+    }, { status: 400 })
 
   const hashedPassword = await bcrypt.hash(body.password, 10)
 
