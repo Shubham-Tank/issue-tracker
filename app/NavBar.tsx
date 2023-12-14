@@ -9,6 +9,7 @@ import { Avatar, Box, Container, DropdownMenu, Flex, Text } from '@radix-ui/them
 import { useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton';
 import { SkeletonTheme } from './components';
+import { RxAvatar } from 'react-icons/rx';
 
 const NavBar = () => {
   return (
@@ -71,13 +72,16 @@ const AuthStatus = () => {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
-        <Avatar
-          src={session!.user!.image!}
-          fallback="?"
-          size="2"
-          radius='full'
-          className='cursor-pointer'
-        />
+        {session!.user!.image!
+          ?
+          <Avatar
+            src={session!.user!.image!}
+            fallback="?"
+            size="2"
+            radius='full'
+            className='cursor-pointer'
+          /> : <div><RxAvatar className="w-7 h-7 bg-slate-700 rounded-full" /></div>
+        }
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         <DropdownMenu.Label>
