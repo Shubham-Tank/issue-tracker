@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  width: 0px;
+}
+
 .EasyMDEContainer .editor-toolbar {
   border: 1px solid var(--gray-a7);
   border-bottom: none;
