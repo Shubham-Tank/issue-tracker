@@ -6,6 +6,9 @@ import IssueChart from './IssueChart'
 import IssueSummary from './IssueSummary'
 import LatestIssues from './LatestIssues'
 import lazyload from 'next/dynamic'
+import { getServerSession } from 'next-auth'
+import authOptions from './auth/authOptions'
+import ProjectList from './ProjectList'
 
 const IssueBoard = lazyload(
   () => import('./components/IssueBoard'),
@@ -15,6 +18,8 @@ const IssueBoard = lazyload(
 )
 
 export default async function Home() {
+
+  const session = await getServerSession(authOptions)
 
   const issues = await prisma.issue.findMany({
     select: {
@@ -32,6 +37,7 @@ export default async function Home() {
 
   return (
     <>
+      <ProjectList session={session} />
       <IssueBoard issues={issues} />
       <Grid columns={{ initial: '1', md: '2' }} gap="5">
         <Flex direction="column" gap="5">
