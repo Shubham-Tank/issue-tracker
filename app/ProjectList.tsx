@@ -17,8 +17,8 @@ const ProjectList = async ({ session }: { session: Session | null }) => {
       <Grid columns={{ initial: '1', sm: '5' }} gap="5">
         {
           projects.map((project) => (
-            <Link href={`/projects/${project.slug}`}>
-              <Card key={project?.id || project.name} className='h-24 cursor-pointer'>
+            <Link href={`/projects/${project.slug}`} key={project.id}>
+              <Card className='h-24 cursor-pointer'>
                 <Text>{project.name}</Text>
               </Card>
             </Link>
