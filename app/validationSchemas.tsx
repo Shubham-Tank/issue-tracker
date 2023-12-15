@@ -30,3 +30,16 @@ export const registerUserSchema = z.object({
       .min(5, 'Password is too small')
       .max(100, 'Password can not be more than 100 characters')
 })
+
+export const createProjectSchema = z.object({
+  name:
+    z
+      .string()
+      .min(1, 'Please Enter Project Name')
+      .min(5, 'Project name should be of atleast 5 characters')
+      .max(50, 'Project name can not be more than 50 characters'),
+  slug:
+    z
+      .string()
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Invalid Project slug')
+})
