@@ -41,5 +41,8 @@ export const createProjectSchema = z.object({
   slug:
     z
       .string()
-      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Invalid Project slug')
+      .min(1, 'Please Enter Slug')
+      .min(5, 'Slug should be of atleast 5 characters')
+      .max(50, 'Slug can not be more than 50 characters')
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug can only contain alphabets, numbers and -')
 })
