@@ -1,24 +1,32 @@
 'use client'
 import { ErrorMessage, Spinner } from '@/app/components'
 import { createProjectSchema } from '@/app/validationSchemas'
+import { createSlug } from '@/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Callout, Heading, TextField, Text, Badge, Button, Flex, Box } from '@radix-ui/themes'
+import { Box, Button, Callout, Flex, Heading, Text, TextField } from '@radix-ui/themes'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 type ProjectFormData = z.infer<typeof createProjectSchema>
 
 const CreateProjectPage = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm<ProjectFormData>({
+  const { register, watch, handleSubmit, setValue, formState: { errors } } = useForm<ProjectFormData>({
     resolver: zodResolver(createProjectSchema)
   })
   const router = useRouter()
 
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const projName = watch('name', '')
+
+  useEffect(() => {
+    const slug = createSlug(projName)
+    setValue('slug', slug)
+  }, [projName])
 
   const handleCreateProject = async (data: ProjectFormData) => {
     setIsSubmitting(true)
@@ -40,7 +48,7 @@ const CreateProjectPage = () => {
         <Callout.Text>{error}</Callout.Text>
       </Callout.Root>}
 
-      <form className='flex flex-col gap-4' onSubmit={handleSubmit(handleCreateProject)}>
+      <form className='flex flex-col gap-4' autoComplete='off' onSubmit={handleSubmit(handleCreateProject)}>
 
         <div>
           <Text className='text-sm font-bold'>Project Name</Text>
