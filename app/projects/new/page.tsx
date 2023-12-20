@@ -13,7 +13,16 @@ import { z } from 'zod'
 type ProjectFormData = z.infer<typeof createProjectSchema>
 
 const CreateProjectPage = () => {
-  const { register, watch, handleSubmit, setValue, formState: { errors } } = useForm<ProjectFormData>({
+  const {
+    register,
+    watch,
+    handleSubmit,
+    setValue,
+    setError: setFormError,
+    clearErrors,
+    trigger,
+    formState: { errors, isSubmitted }
+  } = useForm<ProjectFormData>({
     resolver: zodResolver(createProjectSchema)
   })
   const router = useRouter()
@@ -22,14 +31,53 @@ const CreateProjectPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const projName = watch('name', '')
+  const slug = watch('slug', '')
 
   useEffect(() => {
     const slug = createSlug(projName)
     setValue('slug', slug)
+    if (isSubmitted)
+      trigger('slug')
   }, [projName])
 
+  useEffect(() => {
+    const cancelTokenSource = axios.CancelToken.source();
+
+    if (slug) {
+
+      (async () => {
+        try {
+          const res = await axios.get(`/api/projects/available/${slug}`, {
+            cancelToken: cancelTokenSource.token,
+          })
+          const { available } = res.data
+          if (!available) {
+            setFormError('slug', {
+              type: 'custom',
+              message: 'this slug is already used'
+            })
+          } else {
+            if (errors?.slug?.type === 'custom') {
+              clearErrors('slug')
+            }
+          }
+        } catch (err) {
+          if (!axios.isCancel(err)) {
+            setError('An unexpected error occured.')
+          }
+        }
+      })()
+    }
+
+    return () => {
+      cancelTokenSource.cancel('Request canceled due to component unmounting');
+    };
+  }, [slug])
+
   const handleCreateProject = async (data: ProjectFormData) => {
+    if (errors) return
     setIsSubmitting(true)
+
     try {
       await axios.post('/api/projects', data)
       router.push('/')
@@ -81,7 +129,7 @@ const CreateProjectPage = () => {
           </Flex>
         </div>
 
-        <Button disabled={isSubmitting} className='self-end'>
+        <Button disabled={isSubmitting || Object.keys(errors).length > 0} className='self-end'>
           {isSubmitting ? <>Create<Spinner /></> : 'Create'}
         </Button>
       </form>
