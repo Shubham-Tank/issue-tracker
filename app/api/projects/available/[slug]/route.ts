@@ -15,7 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
   });
 
   if (project)
-    return NextResponse.json({ available: false }, { status: 409 });
+    return NextResponse.json({ available: false });
 
-  return NextResponse.json({ available: true }, { status: 200 });
+  return NextResponse.json({ available: true });
 }
