@@ -8,8 +8,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { slug: string } }) {
 
-  // const session = await getServerSession(authOptions)
-  // if (!session) return NextResponse.json({}, { status: 401 })
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({}, { status: 401 })
 
   const body = await request.json()
 
