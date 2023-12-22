@@ -30,10 +30,8 @@ export default function RootLayout({
           <AuthProvider>
             <Theme appearance='dark' accentColor="blue" radius="large">
               <NavBar />
-              <main className='px-6 py-7'>
-                <Container>
-                  {children}
-                </Container>
+              <main>
+                {children}
               </main>
             </Theme>
           </AuthProvider>

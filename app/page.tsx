@@ -1,14 +1,13 @@
 import prisma from '@/prisma/client'
-import { Status } from '@prisma/client'
-import { Flex, Grid } from '@radix-ui/themes'
+import { Container, Flex, Grid } from '@radix-ui/themes'
 import { Metadata } from 'next'
+import { getServerSession } from 'next-auth'
+import lazyload from 'next/dynamic'
 import IssueChart from './IssueChart'
 import IssueSummary from './IssueSummary'
 import LatestIssues from './LatestIssues'
-import lazyload from 'next/dynamic'
-import { getServerSession } from 'next-auth'
-import authOptions from './auth/authOptions'
 import ProjectList from './ProjectList'
+import authOptions from './auth/authOptions'
 
 const IssueBoard = lazyload(
   () => import('./components/IssueBoard'),
@@ -36,7 +35,7 @@ export default async function Home() {
   const stats = { open, inProgress, closed }
 
   return (
-    <>
+    <Container className='py-7'>
       <ProjectList session={session} />
       <IssueBoard issues={issues} />
       <Grid columns={{ initial: '1', md: '2' }} gap="5">
@@ -46,7 +45,7 @@ export default async function Home() {
         </Flex>
         <LatestIssues />
       </Grid>
-    </>
+    </Container>
   )
 }
 
