@@ -1,16 +1,16 @@
 'use client'
 
-import { Board } from '@prisma/client'
+import { Board, Project } from '@prisma/client'
 import { Box } from '@radix-ui/themes'
+import axios from 'axios'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { RxCross1, RxHamburgerMenu, RxPlusCircled } from 'react-icons/rx'
 import { Menu, MenuItem, MenuItemStyles, Sidebar, SubMenu } from 'react-pro-sidebar'
 
 interface Props {
-  projectSlug: string
-  boards: Board[]
+  project: Project & { boards: Board[] }
 }
 
 const customPurple = 'rgb(30, 41, 59)'
@@ -40,8 +40,13 @@ const menuItemStyles: MenuItemStyles = {
     }
   },
   subMenuContent: {
+    paddingTop: '10px',
+    paddingBottom: '10px',
+    backgroundColor: '#161e2a !important',
     [`.ps-menu-button`]: {
-      backgroundColor: '#161e2a !important'
+      height: '40px',
+      backgroundColor: '#161e2a !important',
+      transition: 'all 0.5s'
     },
     [`.ps-menu-button:hover`]: {
       color: 'rgb(8, 145, 178)',
@@ -49,10 +54,22 @@ const menuItemStyles: MenuItemStyles = {
   }
 }
 
-const ProjectSidebar = ({ projectSlug, boards }: Props) => {
+const ProjectSidebar = ({ project }: Props) => {
   const [collapsed, setCollapsed] = useState(false)
 
+  const router = useRouter()
   const currentPath = usePathname()
+
+  const { slug, boards } = project
+
+  const createNewBoard = async () => {
+    const res = await axios.post<Board>(`/api/projects/${slug}/boards`, {
+      title: 'New Board'
+    })
+    const newBoard = res.data
+    router.push(`/projects/${slug}/boards/${newBoard.id}`)
+    router.refresh()
+  }
 
   return (
     <>
@@ -63,20 +80,27 @@ const ProjectSidebar = ({ projectSlug, boards }: Props) => {
         rootStyles={rootStyles}>
         <Menu menuItemStyles={menuItemStyles}>
           <MenuItem
-            active={currentPath === `/projects/${projectSlug}`}
-            component={<Link href={`/projects/${projectSlug}`} />}
+            active={currentPath === `/projects/${slug}`}
+            component={<Link href={`/projects/${slug}`} />}
           >
             Dashboard
           </MenuItem>
           <SubMenu label="Boards">
             {
               boards.map(board => (
-                <MenuItem key={board.id} className='text-sm'>{board.title}</MenuItem>
+                <MenuItem
+                  key={board.id}
+                  component={<Link href={`/projects/${slug}/boards/${board.id}`} />}
+                  className='text-sm'>
+                  {board.title}
+                </MenuItem>
               ))
             }
-            <MenuItem className='text-sm'>
-              <Box className='flex items-center gap-2'>
-                <RxPlusCircled /> Add New Board
+            <MenuItem className='text-xs'>
+              <Box
+                onClick={createNewBoard}
+                className='flex justify-center items-center gap-2 text-gray-500 hover:text-gray-400 transition-all w-full p-1 border-2 border-gray-600 hover:border-gray-500 border-dashed rounded-md'>
+                <RxPlusCircled size="16px" />
               </Box>
             </MenuItem>
           </SubMenu>

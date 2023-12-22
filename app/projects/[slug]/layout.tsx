@@ -2,6 +2,7 @@ import { Box, Flex } from "@radix-ui/themes"
 import { ReactNode } from "react"
 import ProjectSidebar from "./Sidebar"
 import prisma from '@/prisma/client'
+import { notFound } from "next/navigation"
 
 interface Props {
   children: React.ReactNode
@@ -22,11 +23,13 @@ const ProjectLayout = async ({
     }
   })
 
-  const boards = project!.boards
+  if (!project) {
+    return notFound()
+  }
 
   return (
     <Flex>
-      <ProjectSidebar projectSlug={params.slug} boards={boards} />
+      <ProjectSidebar project={project} />
       <Box className="px-6 py-7">
         {children}
       </Box>
