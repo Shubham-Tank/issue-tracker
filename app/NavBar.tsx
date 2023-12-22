@@ -33,14 +33,16 @@ const NavLinks = () => {
   const currentPath = usePathname()
 
   const links = [
-    { label: "Dashboard", href: '/' },
-    { label: "Issues", href: '/issues' },
+    { label: "Home", href: '/' },
+    { label: "Issues", href: '/issues', hideOn: ['/'] },
   ]
+
+  const visibleLinks = links.filter(link => !link.hideOn?.includes(currentPath))
 
   return (
     <ul className='flex gap-6'>
       {
-        links.map(({ label, href }) => (
+        visibleLinks.map(({ label, href }) => (
           <li key={href}>
             <Link
               href={href}
