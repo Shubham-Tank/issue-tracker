@@ -4,7 +4,7 @@ import { Issue, Status } from '@prisma/client'
 import { Flex } from '@radix-ui/themes'
 import _ from 'lodash'
 import { useState } from 'react'
-import IssuesDropContainer, { SingleIssue } from './IssueBoard/IssuesDropContainer'
+import IssuesDropContainer from './IssueBoard/IssuesDropContainer'
 import { createPortal } from 'react-dom'
 
 type BoardIssue = {
