@@ -1,8 +1,22 @@
 import React from 'react'
+import prisma from '@/prisma/client'
 
-const ProjectDashboardPage = () => {
+interface Props {
+  params: {
+    slug: string
+  }
+}
+
+const ProjectDashboardPage = async ({ params }: Props) => {
+
+  const project = await prisma.project.findUnique({
+    where: { slug: params.slug }
+  })
+
   return (
-    <div>ProjectDashboardPage</div>
+    <>
+      <h1>{project?.name}</h1>
+    </>
   )
 }
 
