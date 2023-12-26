@@ -1,11 +1,12 @@
 'use client'
 
 import { Board, Project } from '@prisma/client'
-import { Box } from '@radix-ui/themes'
+import { Box, Button } from '@radix-ui/themes'
 import axios from 'axios'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { FaTrashAlt } from "react-icons/fa"
 import { RxCross1, RxHamburgerMenu, RxPlusCircled } from 'react-icons/rx'
 import { Menu, MenuItem, MenuItemStyles, Sidebar, SubMenu } from 'react-pro-sidebar'
 
@@ -91,8 +92,13 @@ const ProjectSidebar = ({ project }: Props) => {
                 <MenuItem
                   key={board.id}
                   component={<Link href={`/projects/${slug}/boards/${board.id}`} />}
-                  className='text-sm'>
-                  {board.title}
+                  className='text-sm group'>
+                  <p className='flex justify-between items-center'>
+                    {board.title}
+                    <Button variant='soft' color='red' className="!cursor-pointer !hidden group-hover:!inline-flex">
+                      <FaTrashAlt size="14px" />
+                    </Button>
+                  </p>
                 </MenuItem>
               ))
             }
