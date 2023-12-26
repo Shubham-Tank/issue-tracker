@@ -8,8 +8,8 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }) {
 
-  // const session = await getServerSession(authOptions)
-  // if (!session) return NextResponse.json({}, { status: 401 })
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({}, { status: 401 })
 
   const issueId = parseInt(params.id)
   const issue = await prisma.issue.findUnique({
