@@ -85,7 +85,7 @@ const ProjectSidebar = ({ project }: Props) => {
           >
             Dashboard
           </MenuItem>
-          <SubMenu label="Boards">
+          <SubMenu label="Boards" className={`${collapsed ? 'hidden' : 'block'}`}>
             {
               boards.map(board => (
                 <MenuItem
