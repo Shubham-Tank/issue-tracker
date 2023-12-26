@@ -1,3 +1,4 @@
+import { Spinner } from '@/app/components'
 import { Board, Project } from '@prisma/client'
 import { AlertDialog, Box, Button, Flex } from '@radix-ui/themes'
 import axios from 'axios'
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const BoardListSubmenu = ({ project, isCollapsed }: Props) => {
+  const [deleteBoardId, setDeleteBoardId] = useState('')
   const [isDeleting, setDeleting] = useState(false)
   const [error, setError] = useState(false)
 
@@ -30,15 +32,17 @@ const BoardListSubmenu = ({ project, isCollapsed }: Props) => {
     router.refresh()
   }
 
-  const deleteBoard = async (boardId: string) => {
+  const deleteBoard = async () => {
     try {
       setDeleting(true)
-      await axios.delete(`/api/projects/${slug}/boards/${boardId}`)
+      await axios.delete(`/api/projects/${slug}/boards/${deleteBoardId}`)
       router.push(`/projects/${slug}`)
       router.refresh()
     } catch (e) {
-      setDeleting(false)
       setError(true)
+    } finally {
+      setDeleting(false)
+      setDeleteBoardId('')
     }
   }
 
@@ -52,32 +56,13 @@ const BoardListSubmenu = ({ project, isCollapsed }: Props) => {
             className='text-sm group'>
             <p className='flex justify-between items-center'>
               {board.title}
-              <AlertDialog.Root>
-                <AlertDialog.Trigger>
-                  <Button variant='soft' color='red' className="!cursor-pointer !hidden group-hover:!inline-flex">
-                    <FaTrashAlt size="14px" />
-                  </Button>
-                </AlertDialog.Trigger>
-                <AlertDialog.Content>
-                  <AlertDialog.Title>Confirm Deletion</AlertDialog.Title>
-                  <AlertDialog.Description>
-                    Are you sure you want to delete this board? This action cannot be undone.
-                  </AlertDialog.Description>
-                  <Flex gap="3" mt="4" justify="end">
-                    <AlertDialog.Cancel>
-                      <Button variant="soft" color="gray">Cancel</Button>
-                    </AlertDialog.Cancel>
-                    <AlertDialog.Action>
-                      <Button
-                        color="red"
-                        disabled={isDeleting}
-                        onClick={(e) => deleteBoard(board.id)} >
-                        Delete
-                      </Button>
-                    </AlertDialog.Action>
-                  </Flex>
-                </AlertDialog.Content>
-              </AlertDialog.Root>
+              <Button
+                variant='soft'
+                color='red'
+                className="!cursor-pointer !hidden group-hover:!inline-flex"
+                onClick={() => setDeleteBoardId(board.id)}>
+                <FaTrashAlt size="14px" />
+              </Button>
             </p>
           </MenuItem>
         ))
@@ -89,6 +74,32 @@ const BoardListSubmenu = ({ project, isCollapsed }: Props) => {
           <RxPlusCircled size="16px" />
         </Box>
       </MenuItem>
+
+      <AlertDialog.Root open={deleteBoardId !== ''}>
+        <AlertDialog.Trigger>
+        </AlertDialog.Trigger>
+        <AlertDialog.Content>
+          <AlertDialog.Title>Confirm Deletion</AlertDialog.Title>
+          <AlertDialog.Description>
+            Are you sure you want to delete this board? This action cannot be undone.
+          </AlertDialog.Description>
+          <Flex gap="3" mt="4" justify="end">
+            <AlertDialog.Cancel>
+              <Button variant="soft" color="gray" onClick={() => setDeleteBoardId('')}>Cancel</Button>
+            </AlertDialog.Cancel>
+            <AlertDialog.Action>
+              <Button
+                color="red"
+                disabled={isDeleting}
+                onClick={deleteBoard}
+              >
+                {isDeleting && <Spinner />}
+                Delete
+              </Button>
+            </AlertDialog.Action>
+          </Flex>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
 
       <AlertDialog.Root open={error}>
         <AlertDialog.Content>
