@@ -1,14 +1,13 @@
 'use client'
 
 import { Board, Project } from '@prisma/client'
-import { Box, Button } from '@radix-ui/themes'
-import axios from 'axios'
+import { Box } from '@radix-ui/themes'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { FaTrashAlt } from "react-icons/fa"
-import { RxCross1, RxHamburgerMenu, RxPlusCircled } from 'react-icons/rx'
-import { Menu, MenuItem, MenuItemStyles, Sidebar, SubMenu } from 'react-pro-sidebar'
+import { RxCross1, RxHamburgerMenu } from 'react-icons/rx'
+import { Menu, MenuItem, MenuItemStyles, Sidebar } from 'react-pro-sidebar'
+import BoardListSubmenu from './BoardListSubmenu'
 
 interface Props {
   project: Project & { boards: Board[] }
@@ -58,19 +57,9 @@ const menuItemStyles: MenuItemStyles = {
 const ProjectSidebar = ({ project }: Props) => {
   const [collapsed, setCollapsed] = useState(false)
 
-  const router = useRouter()
   const currentPath = usePathname()
 
-  const { slug, boards } = project
-
-  const createNewBoard = async () => {
-    const res = await axios.post<Board>(`/api/projects/${slug}/boards`, {
-      title: 'New Board'
-    })
-    const newBoard = res.data
-    router.push(`/projects/${slug}/boards/${newBoard.id}`)
-    router.refresh()
-  }
+  const { slug } = project
 
   return (
     <>
@@ -86,30 +75,7 @@ const ProjectSidebar = ({ project }: Props) => {
           >
             Dashboard
           </MenuItem>
-          <SubMenu label="Boards" className={`${collapsed ? 'hidden' : 'block'}`}>
-            {
-              boards.map(board => (
-                <MenuItem
-                  key={board.id}
-                  component={<Link href={`/projects/${slug}/boards/${board.id}`} />}
-                  className='text-sm group'>
-                  <p className='flex justify-between items-center'>
-                    {board.title}
-                    <Button variant='soft' color='red' className="!cursor-pointer !hidden group-hover:!inline-flex">
-                      <FaTrashAlt size="14px" />
-                    </Button>
-                  </p>
-                </MenuItem>
-              ))
-            }
-            <MenuItem className='text-xs'>
-              <Box
-                onClick={createNewBoard}
-                className='flex justify-center items-center gap-2 text-gray-500 hover:text-gray-400 transition-all w-full p-1 border-2 border-gray-600 hover:border-gray-500 border-dashed rounded-md'>
-                <RxPlusCircled size="16px" />
-              </Box>
-            </MenuItem>
-          </SubMenu>
+          <BoardListSubmenu project={project} isCollapsed={collapsed} />
         </Menu>
       </Sidebar>
 
