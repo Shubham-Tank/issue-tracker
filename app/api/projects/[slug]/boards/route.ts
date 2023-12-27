@@ -1,5 +1,5 @@
 import authOptions from "@/app/auth/authOptions";
-import { createBoardSchema } from "@/app/validationSchemas";
+import { boardSchema } from "@/app/validationSchemas";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from '@/prisma/client'
@@ -13,7 +13,7 @@ export async function POST(
 
   const body = await request.json()
 
-  const validation = createBoardSchema.safeParse(body)
+  const validation = boardSchema.safeParse(body)
   if (!validation.success)
     return NextResponse.json(validation.error.format(), { status: 400 })
 
