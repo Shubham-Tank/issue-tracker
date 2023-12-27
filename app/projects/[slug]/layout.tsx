@@ -1,8 +1,8 @@
-import { Box, Flex } from "@radix-ui/themes"
-import { ReactNode } from "react"
-import ProjectSidebar from "./Sidebar"
 import prisma from '@/prisma/client'
+import { Box, Flex } from "@radix-ui/themes"
 import { notFound } from "next/navigation"
+import ProjectProvider from "./ProjectProvider"
+import ProjectSidebar from "./Sidebar"
 
 interface Props {
   children: React.ReactNode
@@ -28,12 +28,14 @@ const ProjectLayout = async ({
   }
 
   return (
-    <Flex>
-      <ProjectSidebar project={project} />
-      <Box className="px-6 py-7">
-        {children}
-      </Box>
-    </Flex>
+    <ProjectProvider project={project}>
+      <Flex>
+        <ProjectSidebar />
+        <Box className="px-6 py-7">
+          {children}
+        </Box>
+      </Flex >
+    </ProjectProvider>
   )
 }
 export default ProjectLayout

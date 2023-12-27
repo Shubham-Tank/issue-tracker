@@ -3,15 +3,12 @@
 import { Board, Project } from '@prisma/client'
 import { Box } from '@radix-ui/themes'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { notFound, usePathname } from 'next/navigation'
+import { useContext, useState } from 'react'
 import { RxCross1, RxHamburgerMenu } from 'react-icons/rx'
 import { Menu, MenuItem, MenuItemStyles, Sidebar } from 'react-pro-sidebar'
 import BoardListSubmenu from './BoardListSubmenu'
-
-interface Props {
-  project: Project & { boards: Board[] }
-}
+import { ProjectContext } from './ProjectProvider'
 
 const customPurple = 'rgb(30, 41, 59)'
 const customCyan = `rgb(6 182 212)`
@@ -54,10 +51,13 @@ const menuItemStyles: MenuItemStyles = {
   }
 }
 
-const ProjectSidebar = ({ project }: Props) => {
+const ProjectSidebar = () => {
   const [collapsed, setCollapsed] = useState(false)
 
+  const project = useContext(ProjectContext)
   const currentPath = usePathname()
+
+  if (!project) return notFound()
 
   const { slug } = project
 
