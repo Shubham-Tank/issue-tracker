@@ -19,6 +19,8 @@ model Issue {
   updatedAt        DateTime @updatedAt
   assignedToUser   User?    @relation(fields: [assignedToUserId], references: [id])
   assignedToUserId String?
+  board            Board?   @relation(fields: [boardId], references: [id], onDelete: SetNull)
+  boardId          String?
 }
 
 enum Status {
@@ -89,4 +91,5 @@ model Board {
   title     String
   project   Project @relation(fields: [projectId], references: [id])
   projectId String
+  Issue     Issue[]
 }
