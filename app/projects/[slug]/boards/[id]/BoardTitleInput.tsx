@@ -21,16 +21,16 @@ type BoardFormData = z.infer<typeof boardSchema>
 
 const BoardTitleInput = ({ board }: Props) => {
   const router = useRouter()
-
-  const project = useContext(ProjectContext)
-  if (!project) return notFound()
-
   const { register, handleSubmit, formState: { errors } } = useForm<BoardFormData>({
     defaultValues: {
       title: board.title
     },
     resolver: zodResolver(boardSchema)
   })
+
+  const project = useContext(ProjectContext)
+  if (!project) return notFound()
+
 
   const updateTitle = async (data: BoardFormData) => {
     try {
