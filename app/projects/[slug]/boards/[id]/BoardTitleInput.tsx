@@ -49,9 +49,9 @@ const BoardTitleInput = ({ board }: Props) => {
           placeholder='Title'
           {...register('title', { onBlur: handleSubmit(updateTitle) })} />
       </TextField.Root>
-      <ErrorMessage>
-        <p className='text-sm'>{errors.title?.message}</p>
-      </ErrorMessage>
+      <div className='text-sm'>
+        <ErrorMessage>{errors.title?.message}</ErrorMessage>
+      </div>
       <Toaster />
     </form>
   )
