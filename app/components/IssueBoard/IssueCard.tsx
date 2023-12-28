@@ -13,7 +13,7 @@ const IssueCard = ({ issue }: { issue: BoardIssue }) => {
     transition,
     isDragging,
     active
-  } = useSortable({ id: issue.id, data: { issue } });
+  } = useSortable({ id: issue.id, data: { issue, type: 'issue' } });
 
   const style = {
     transform: CSS.Transform.toString(transform),

@@ -41,14 +41,44 @@ const IssueBoard = ({ issues }: { issues: BoardIssue[] }) => {
 
   const [allIssues, setAllIssues] = useState<StatusIssues>(groupIssueByStatus(issues) as StatusIssues)
   const [activeIssue, setActiveIssue] = useState<BoardIssue | null>(null)
-  console.log(allIssues)
 
   const onDragStart = (e: DragStartEvent) => {
     setActiveIssue(e.active.data.current?.issue || null)
   }
 
+  const addIssueToEmptyContainer = (containerStatus: Status, activeIssue: BoardIssue) => {
+    setTimeout(() => {
+      setAllIssues((issues) => {
+        const oldStatus = activeIssue.status
+        const updatedActiveIssue = { ...activeIssue, status: containerStatus }
+
+        let issuesOfOldContainer = [...issues[oldStatus]]
+        issuesOfOldContainer = issuesOfOldContainer.filter(issue => issue.id !== activeIssue.id)
+
+        const issuesOfNewContainer = [...issues[containerStatus]]
+        issuesOfNewContainer.unshift(updatedActiveIssue)
+
+        const updatedIssues: StatusIssues = _.cloneDeep(issues)
+        updatedIssues[oldStatus] = issuesOfOldContainer
+        updatedIssues[containerStatus] = issuesOfNewContainer
+
+        return updatedIssues
+      })
+    }, 100)
+  }
+
   const onDragOver = (e: DragOverEvent) => {
     const activeIssue: BoardIssue = e.active.data.current?.issue
+
+    const isOverContainer = e.over?.data.current?.type === 'container'
+    if (isOverContainer) {
+      const containerStatus = e.over?.id as Status
+      if (containerStatus !== activeIssue.status) {
+        addIssueToEmptyContainer(containerStatus, activeIssue)
+        return
+      }
+    }
+
     const overIssue: BoardIssue = e.over?.data.current?.issue
 
     if (!overIssue?.status) return

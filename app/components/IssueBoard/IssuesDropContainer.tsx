@@ -17,6 +17,11 @@ interface Props {
 
 const IssuesDropContainer = ({ label, issues, status }: Props) => {
 
+  const { setNodeRef } = useDroppable({
+    id: status,
+    data: { type: 'container' }
+  });
+
   const issuesIds = useMemo(() => {
     return issues.map(i => i.id)
   }, [issues])
@@ -33,9 +38,11 @@ const IssuesDropContainer = ({ label, issues, status }: Props) => {
       <SortableContext
         items={issuesIds}
       >
-        <ul>
+        <ul ref={setNodeRef}>
           {
-            issues.map(issue => <IssueCard key={issue.id} issue={issue} />)
+            issues.length !== 0
+              ? issues.map(issue => <IssueCard key={issue.id} issue={issue} />)
+              : <div className='pb-3'></div>
           }
         </ul>
       </SortableContext>
