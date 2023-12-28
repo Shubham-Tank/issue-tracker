@@ -42,7 +42,7 @@ const BoardTitleInput = ({ board }: Props) => {
   }
 
   return (
-    <form>
+    <form className='w-1/4 min-w-fit'>
       <TextField.Root>
         <TextField.Input
           style={{ padding: '1.1rem 0.45rem' }}

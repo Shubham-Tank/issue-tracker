@@ -31,7 +31,7 @@ const ProjectLayout = async ({
     <ProjectProvider project={project}>
       <Flex>
         <ProjectSidebar />
-        <Box className="px-6 py-7">
+        <Box className="px-6 py-7 grow">
           {children}
         </Box>
       </Flex >

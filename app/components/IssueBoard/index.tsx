@@ -1,6 +1,6 @@
 'use client'
 import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core'
-import { Status } from '@prisma/client'
+import { Issue, Status } from '@prisma/client'
 import { Flex } from '@radix-ui/themes'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -23,17 +23,25 @@ const statuses: Record<Status, string> = {
   CLOSED: 'Closed'
 }
 
-const groupBy = (items: any[], key: string) => {
-  return items.reduce(function (rv, x) {
-    (rv[x[key]] = rv[x[key]] || []).push(x);
-    return rv;
-  }, {});
+const groupIssueByStatus = (issues: BoardIssue[]) => {
+  const allIssues: Record<Status, BoardIssue[] | [] | string> = { ...statuses }
+  for (let status in allIssues) {
+    allIssues[status as Status] = issues
+      .filter(issue => issue.status === status)
+      .map(issue => ({
+        id: issue.id,
+        title: issue.title,
+        status: issue.status
+      }))
+  }
+  return allIssues
 }
 
 const IssueBoard = ({ issues }: { issues: BoardIssue[] }) => {
 
-  const [allIssues, setAllIssues] = useState<StatusIssues>(groupBy(issues, 'status'))
+  const [allIssues, setAllIssues] = useState<StatusIssues>(groupIssueByStatus(issues) as StatusIssues)
   const [activeIssue, setActiveIssue] = useState<BoardIssue | null>(null)
+  console.log(allIssues)
 
   const onDragStart = (e: DragStartEvent) => {
     setActiveIssue(e.active.data.current?.issue || null)

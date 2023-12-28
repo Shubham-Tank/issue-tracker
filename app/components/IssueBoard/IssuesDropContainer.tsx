@@ -22,7 +22,7 @@ const IssuesDropContainer = ({ label, issues, status }: Props) => {
   }, [issues])
 
   return (
-    <Card className='w-1/3 overflow-visible'>
+    <Card className='w-1/3 min-w-[300px] max-w-sm overflow-visible'>
       <Text as='p' className='font-bold text-center'>
         {label}
       </Text>
