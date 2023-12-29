@@ -132,7 +132,7 @@ const IssueBoard = ({ issues }: { issues: BoardIssue[] }) => {
 
     const overIssue: BoardIssue = e.over?.data.current?.issue
 
-    if (!overIssue.status) return
+    if (!overIssue?.status) return
 
     if (activeIssue.status === overIssue.status) {
       setAllIssues((issues) => {
