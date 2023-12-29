@@ -1,13 +1,15 @@
 'use client'
 import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core'
-import { Issue, Status } from '@prisma/client'
+import { arrayMove } from '@dnd-kit/sortable'
+import { Status } from '@prisma/client'
 import { Flex } from '@radix-ui/themes'
+import axios from 'axios'
+import _ from 'lodash'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import IssuesDropContainer from './IssuesDropContainer'
+import toast from 'react-hot-toast'
 import IssueCard from './IssueCard'
-import { arrayMove } from '@dnd-kit/sortable'
-import _ from 'lodash'
+import IssuesDropContainer from './IssuesDropContainer'
 
 export type BoardIssue = {
   id: number;
@@ -38,33 +40,59 @@ const groupIssueByStatus = (issues: BoardIssue[]) => {
 }
 
 const IssueBoard = ({ issues }: { issues: BoardIssue[] }) => {
-
   const [allIssues, setAllIssues] = useState<StatusIssues>(groupIssueByStatus(issues) as StatusIssues)
-  const [activeIssue, setActiveIssue] = useState<BoardIssue | null>(null)
+  const [currentActiveIssue, setCurrentActiveIssue] = useState<BoardIssue | null>(null)
 
   const onDragStart = (e: DragStartEvent) => {
-    setActiveIssue(e.active.data.current?.issue || null)
+    setCurrentActiveIssue(e.active.data.current?.issue || null)
+  }
+
+  const updateIssueStatus = async (id: number, status: Status) => {
+    try {
+      await axios.patch(`/api/issues/${id}`, { status })
+    } catch (e) {
+      toast.error('something went wrong.')
+    }
   }
 
   const addIssueToEmptyContainer = (containerStatus: Status, activeIssue: BoardIssue) => {
-    setTimeout(() => {
-      setAllIssues((issues) => {
-        const oldStatus = activeIssue.status
-        const updatedActiveIssue = { ...activeIssue, status: containerStatus }
+    setAllIssues((issues) => {
+      const oldStatus = activeIssue.status
+      const updatedActiveIssue = { ...activeIssue, status: containerStatus }
 
-        let issuesOfOldContainer = [...issues[oldStatus]]
-        issuesOfOldContainer = issuesOfOldContainer.filter(issue => issue.id !== activeIssue.id)
+      let issuesOfOldContainer = [...issues[oldStatus]]
+      issuesOfOldContainer = issuesOfOldContainer.filter(issue => issue.id !== activeIssue.id)
 
-        const issuesOfNewContainer = [...issues[containerStatus]]
-        issuesOfNewContainer.unshift(updatedActiveIssue)
+      const issuesOfNewContainer = [...issues[containerStatus]]
+      issuesOfNewContainer.unshift(updatedActiveIssue)
 
-        const updatedIssues: StatusIssues = _.cloneDeep(issues)
-        updatedIssues[oldStatus] = issuesOfOldContainer
-        updatedIssues[containerStatus] = issuesOfNewContainer
+      const updatedIssues: StatusIssues = _.cloneDeep(issues)
+      updatedIssues[oldStatus] = issuesOfOldContainer
+      updatedIssues[containerStatus] = issuesOfNewContainer
 
-        return updatedIssues
-      })
-    }, 100)
+      return updatedIssues
+    })
+  }
+
+  const addIssueToNonEmptyContainer = (overIssue: BoardIssue, activeIssue: BoardIssue) => {
+    setAllIssues((issues) => {
+      const updatedActiveTask = { ...activeIssue, status: overIssue.status }
+
+      const issuesOfOldContainer = [...issues[activeIssue.status]]
+      const issuesOfNewContainer = [...issues[overIssue.status]]
+
+      const updatedIssues: StatusIssues = _.cloneDeep(issues)
+
+      updatedIssues[activeIssue.status] = issuesOfOldContainer.filter(i => i.id !== activeIssue.id)
+
+      issuesOfNewContainer.push(updatedActiveTask)
+      const activeIndex = issuesOfNewContainer.length - 1
+      const overIndex = issuesOfNewContainer.findIndex(i => i.id === overIssue.id)
+      updatedIssues[overIssue.status] = arrayMove(issuesOfNewContainer, activeIndex, overIndex)
+
+      return updatedIssues
+
+    })
   }
 
   const onDragOver = (e: DragOverEvent) => {
@@ -85,34 +113,26 @@ const IssueBoard = ({ issues }: { issues: BoardIssue[] }) => {
 
     if (activeIssue.status !== overIssue.status) {
       // in different column
-      setAllIssues((issues) => {
-        const updatedActiveTask = { ...activeIssue, status: overIssue.status }
-
-        const issuesOfOldContainer = [...issues[activeIssue.status]]
-        const issuesOfNewContainer = [...issues[overIssue.status]]
-
-        const updatedIssues: StatusIssues = _.cloneDeep(issues)
-
-        updatedIssues[activeIssue.status] = issuesOfOldContainer.filter(i => i.id !== activeIssue.id)
-
-        issuesOfNewContainer.push(updatedActiveTask)
-        const activeIndex = issuesOfNewContainer.length - 1
-        const overIndex = issuesOfNewContainer.findIndex(i => i.id === overIssue.id)
-        updatedIssues[overIssue.status] = arrayMove(issuesOfNewContainer, activeIndex, overIndex)
-
-        return updatedIssues
-
-      })
+      addIssueToNonEmptyContainer(overIssue, activeIssue)
     }
   }
 
   const onDragEnd = (e: DragEndEvent) => {
-    setActiveIssue(null)
+    setCurrentActiveIssue(null)
 
     const activeIssue: BoardIssue = e.active.data.current?.issue
+
+    const isOverContainer = e.over?.data.current?.type === 'container'
+
+    if (isOverContainer) {
+      const containerStatus = e.over?.id as Status
+      updateIssueStatus(activeIssue.id, containerStatus)
+      return
+    }
+
     const overIssue: BoardIssue = e.over?.data.current?.issue
 
-    if (!overIssue?.status) return
+    if (!overIssue.status) return
 
     if (activeIssue.status === overIssue.status) {
       setAllIssues((issues) => {
@@ -127,6 +147,7 @@ const IssueBoard = ({ issues }: { issues: BoardIssue[] }) => {
       })
     }
 
+    updateIssueStatus(activeIssue.id, overIssue.status)
   }
 
   return (
@@ -149,7 +170,7 @@ const IssueBoard = ({ issues }: { issues: BoardIssue[] }) => {
       {
         createPortal(
           <DragOverlay>
-            {activeIssue && <IssueCard issue={activeIssue} />}
+            {currentActiveIssue && <IssueCard issue={currentActiveIssue} />}
           </DragOverlay>
           , document?.querySelector('.issue-board-container') || document.body)
       }
