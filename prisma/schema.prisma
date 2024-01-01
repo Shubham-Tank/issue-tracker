@@ -19,6 +19,8 @@ model Issue {
   updatedAt        DateTime @updatedAt
   assignedToUser   User?    @relation(fields: [assignedToUserId], references: [id])
   assignedToUserId String?
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        String
   board            Board?   @relation(fields: [boardId], references: [id], onDelete: SetNull)
   boardId          String?
   positionOnBoard  Int?
@@ -85,6 +87,7 @@ model Project {
   owner   User    @relation(fields: [ownerId], references: [id])
   ownerId String
   boards  Board[]
+  issues  Issue[]
 }
 
 model Board {
