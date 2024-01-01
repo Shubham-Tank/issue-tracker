@@ -1,7 +1,7 @@
 'use client'
 import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
-import { Status } from '@prisma/client'
+import { Issue, Status } from '@prisma/client'
 import { Flex } from '@radix-ui/themes'
 import axios from 'axios'
 import _ from 'lodash'
@@ -15,6 +15,7 @@ export type BoardIssue = {
   id: number;
   title: string;
   status: Status;
+  positionOnBoard: number;
 }
 
 type StatusIssues = Record<Status, BoardIssue[] | []>
@@ -25,21 +26,23 @@ const statuses: Record<Status, string> = {
   CLOSED: 'Closed'
 }
 
-const groupIssueByStatus = (issues: BoardIssue[]) => {
+const groupIssueByStatus = (issues: Issue[]) => {
   const allIssues: Record<Status, BoardIssue[] | [] | string> = { ...statuses }
   for (let status in allIssues) {
-    allIssues[status as Status] = issues
-      .filter(issue => issue.status === status)
+    const filteredIssues = issues.filter(issue => issue.status === status)
+    const sortedIssues = _.sortBy(filteredIssues, [i => i.positionOnBoard])
+    allIssues[status as Status] = sortedIssues
       .map(issue => ({
         id: issue.id,
         title: issue.title,
-        status: issue.status
+        status: issue.status,
+        positionOnBoard: issue.positionOnBoard as number
       }))
   }
   return allIssues
 }
 
-const IssueBoard = ({ issues }: { issues: BoardIssue[] }) => {
+const IssueBoard = ({ issues }: { issues: Issue[] }) => {
   const [allIssues, setAllIssues] = useState<StatusIssues>(groupIssueByStatus(issues) as StatusIssues)
   const [currentActiveIssue, setCurrentActiveIssue] = useState<BoardIssue | null>(null)
 
@@ -52,6 +55,25 @@ const IssueBoard = ({ issues }: { issues: BoardIssue[] }) => {
       await axios.patch(`/api/issues/${id}`, { status })
     } catch (e) {
       toast.error('something went wrong.')
+    }
+  }
+
+  const updateIssuePosition = async (id: number, positionOnBoard: number) => {
+    try {
+      await axios.patch(`/api/issues/${id}`, { positionOnBoard })
+    } catch (e) {
+      toast.error('something went wrong.')
+    }
+  }
+
+  const updateIssuesAfterReorder = (allIssues: StatusIssues) => {
+    for (let status in allIssues) {
+      const statusIssues = allIssues[status as Status]
+      for (const [index, issue] of statusIssues.entries()) {
+        if (issue.positionOnBoard !== index) {
+          updateIssuePosition(issue.id, index)
+        }
+      }
     }
   }
 
@@ -127,6 +149,7 @@ const IssueBoard = ({ issues }: { issues: BoardIssue[] }) => {
     if (isOverContainer) {
       const containerStatus = e.over?.id as Status
       updateIssueStatus(activeIssue.id, containerStatus)
+      updateIssuesAfterReorder(allIssues)
       return
     }
 
@@ -136,12 +159,15 @@ const IssueBoard = ({ issues }: { issues: BoardIssue[] }) => {
 
     if (activeIssue.status === overIssue.status) {
       setAllIssues((issues) => {
-        const currentStatusIssues = [...issues[activeIssue.status]]
+        const status = activeIssue.status
+
+        const currentStatusIssues = [...issues[status]]
         const activeIndex = currentStatusIssues.findIndex(i => i.id === activeIssue.id)
         const overIndex = currentStatusIssues.findIndex(i => i.id === overIssue.id)
 
         const updatedIssues: StatusIssues = _.cloneDeep(issues)
-        updatedIssues[activeIssue.status] = arrayMove(currentStatusIssues, activeIndex, overIndex)
+        updatedIssues[status] = arrayMove(currentStatusIssues, activeIndex, overIndex)
+        updateIssuesAfterReorder(updatedIssues)
 
         return updatedIssues
       })
