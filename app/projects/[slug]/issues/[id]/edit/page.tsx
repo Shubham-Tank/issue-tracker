@@ -9,7 +9,7 @@ interface Props {
 }
 
 const IssueForm = dynamic(
-  () => import('@/app/issues/_components/IssueForm'),
+  () => import('@/app/projects/[slug]/issues/_components/IssueForm'),
   {
     ssr: false,
     loading: () => <IssueFormSkeleton />
