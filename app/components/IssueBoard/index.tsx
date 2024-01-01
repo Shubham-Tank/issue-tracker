@@ -15,7 +15,7 @@ export type BoardIssue = {
   id: number;
   title: string;
   status: Status;
-  positionOnBoard: number;
+  positionOnBoard?: number;
 }
 
 type StatusIssues = Record<Status, BoardIssue[] | []>
